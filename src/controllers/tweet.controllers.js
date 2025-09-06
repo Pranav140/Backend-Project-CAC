@@ -36,7 +36,7 @@ const getUserTweets = asyncHandler(async (req, res) => {
 
     const tweets = await Tweet.find({owner :userId})
 
-    if(!tweets||tweets.length()===0){
+    if(!tweets||tweets.length ===0){
         return res.status(200).json(
             new ApiResponse(200,[],"No tweets found")
         )
@@ -54,7 +54,7 @@ const updateTweet = asyncHandler(async (req, res) => {
         throw new ApiError(400,"content is required")
     }
 
-    if(!tweetId || isValidObjectId(tweetId)){
+    if(!tweetId || !isValidObjectId(tweetId)){
         throw new ApiError(400,"invalid tweet id")
     }
 
@@ -84,7 +84,7 @@ const updateTweet = asyncHandler(async (req, res) => {
 })
 
 const deleteTweet = asyncHandler(async (req, res) => {
-    const tweetId = req.params
+    const {tweetId }= req.params
     if(!tweetId|| !isValidObjectId(tweetId)){
         throw new ApiError(400,"invalid tweet id")
     }
@@ -99,7 +99,7 @@ const deleteTweet = asyncHandler(async (req, res) => {
         throw new ApiError(403,"unauthorized");
     }
 
-    await tweet.findByIdAndDelete(tweetId)
+    await Tweet.findByIdAndDelete(tweetId)
 
     return res.status(200).json(
         new ApiResponse(200,{},"tweet deleted successfully")
