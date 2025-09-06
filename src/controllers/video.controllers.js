@@ -15,11 +15,71 @@ const getAllVideos = asyncHandler(async (req, res) => {
 const publishAVideo = asyncHandler(async (req, res) => {
     const { title, description} = req.body
     // TODO: get video, upload to cloudinary, create video
+
+    if(!title||!description){
+        throw new ApiError(400,"title and description required")
+    }
+
+    const videoLocalPath = req.files?.videoFile?.[0]?.path 
+    const thumbnailLocalPath = req.files?.thumbnail?.[0]?.path 
+
+    if(!videoLocalPath){
+        throw new ApiError(400,"video file is required")
+    }
+
+    if(!thumbnailLocalPath){
+        throw new ApiError(400,"thumbnail is required")
+    }
+
+    const videoFile = await uploadOnCloudinary(videoLocalPath)
+    const thumbnail = await uploadOnCloudinary(thumbnailLocalPath)
+
+    if(!videoFile){
+        throw new ApiError(500,"error while uploading video")
+    }
+    if(!thumbnail){
+        throw new ApiError(500,"error while uploading thumbnail")
+    }
+
+    const video = await Video.create({
+        videoFile:videoFile.url,
+        thumbnail:thumbnail.url,
+        title,
+        description,
+        duration : videoFile.duration,
+        owber:req.user?._id
+    })
+
+    const createdVideo = await Video.findById(video._id).populate("owner","username fullName avatar")
+
+    if(!createdVideo){
+        throw new ApiError(500,"Error while creating video")
+    }
+
+    return res.status(201).json(
+        new ApiResponse(201,createdVideo,"Video created successfully")
+    )
 })
 
 const getVideoById = asyncHandler(async (req, res) => {
     const { videoId } = req.params
     //TODO: get video by id
+    if(!videoId || !isValidObjectId(videoId)){
+        throw new ApiError(400,"Invalid video")
+    }
+
+    const video = await Video.findById(videoId).populate("owner","username fullName avatar")
+
+    if(!video){
+        throw new ApiError(404,"Video not found")
+    }
+
+    video.views += 1
+    await video.save()
+
+    return res.status(200).json(
+        new ApiResponse(200,[],"Video fetched successfully")
+    )
 })
 
 const updateVideo = asyncHandler(async (req, res) => {
