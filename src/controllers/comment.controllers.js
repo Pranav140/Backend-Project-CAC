@@ -109,7 +109,39 @@ const addComment = asyncHandler(async (req, res) => {
 })
 
 const updateComment = asyncHandler(async (req, res) => {
-    // TODO: update a comment
+    const {commentId} = req.params
+    const {content} = req.body
+
+    if(!commentId||!isValidObjectId(commentId)){
+        throw new ApiError(400,"comment invalid")
+    }
+    if(!content|| content?.trim()===""){
+        throw new ApiError(400,"content required")
+    }
+
+    const comment = await Comment.findById(commentId)
+
+    if(!comment){
+        throw new ApiError(404,"comment not found")
+    }
+
+    if(comment.owner.toString()!== req.user?._id.toString()){
+        throw new ApiError(403,"unauthorized user")
+    }
+
+    const updatedComment = await Comment.findByIdAndUpdate(
+        commentId,
+        {
+            $set:{
+                content
+            }
+        },
+        {new:true}
+    ).populate("owner","username fullName avatar")
+
+    return res.status(200).json(
+        new ApiResponse(200,updatedComment,"Comment updated succesfully")
+    )
 })
 
 const deleteComment = asyncHandler(async (req, res) => {
