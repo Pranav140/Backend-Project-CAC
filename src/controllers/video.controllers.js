@@ -86,6 +86,12 @@ const updateVideo = asyncHandler(async (req, res) => {
     const { videoId } = req.params
     //TODO: update video details like title, description, thumbnail
 
+    if(!videoId || !isValidObjectId(videoId)){
+        throw new ApiError(400,"Invalid video")
+    }
+
+    
+
 })
 
 const deleteVideo = asyncHandler(async (req, res) => {
