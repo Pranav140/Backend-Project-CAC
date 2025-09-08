@@ -5,10 +5,11 @@
     "comments": false,
     "strings": false
   },
-
+  "editor.suggest.showWords": true,
+  "editor.suggest.showSnippets": false,
   // ❌ Kill inline AI suggestions
   "editor.inlineSuggest.enabled": false,
-
   // (Optional) prevent snippet spam
-  "editor.suggest.showSnippets": false
+  "blackbox.inlineSuggest.enable": false, // for Blackbox AI
+  "cybercoder.inlineSuggest.enable": false, // for CyberCoder AI (if present)
 }
