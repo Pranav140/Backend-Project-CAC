@@ -1,0 +1,14 @@
+{
+  // ✅ Keep IntelliSense keyword suggestions
+  "editor.quickSuggestions": {
+    "other": true,
+    "comments": false,
+    "strings": false
+  },
+
+  // ❌ Kill inline AI suggestions
+  "editor.inlineSuggest.enabled": false,
+
+  // (Optional) prevent snippet spam
+  "editor.suggest.showSnippets": false
+}

@@ -89,6 +89,35 @@ const updateVideo = asyncHandler(async (req, res) => {
     if(!videoId || !isValidObjectId(videoId)){
         throw new ApiError(400,"Invalid video")
     }
+
+    const {title , description} = req.body
+    const thumbnailLocalPath = req.file?.path
+
+    if(!title && !description && !thumbnailLocalPath){
+        throw new ApiError(400,"At least one field is required")
+    }
+    const video = await Video.findById(videoId)
+
+    if(!video){
+        throw new ApiError(404,"Video not found")
+    }
+
+    if(video.owner.toString()!= req.user?._id.toString()){
+        throw new ApiError(403,"Unauthorized")
+    }
+
+    const updateFields = {}
+    if(title) updateFields.title = title
+    if(description) updateFields.description = description
+
+    if(thumbnailLocalPath){
+        const thumbnail = await uploadOnCloudinary(thumbnailLocalPath) 
+
+        if(!thumbnail){
+            throw new ApiError(500," Error while uploading thumbnail")
+        }
+        updateFields.thumbnail = thumbnail.url
+    }
 })
 
 const deleteVideo = asyncHandler(async (req, res) => {
